@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<title>Testes de código</title>
+		<link href="../css/verifica.css" type="text/css" rel="stylesheet" />
+		<script src="../js/linda.js" type="application/javascript"></script>
+		<script src="../js/jsHint.js" type="application/javascript"></script>
+		<script src="../js/verifica.js" type="application/javascript"></script>
+		<script defer type="application/javascript">
+			Dom.$(janela).tratarCarregamento(function () {
+				var arquivos = [
+					"../js/cortex.js",
+					"../js/cortex.comunicacao.js",
+					"../js/cortex.http.js",
+					"../js/cortex.util.js",
+					"../js/microMundo.js",
+					"../js/modulo.js"
+				];
+				var verificacao = new Verifica(arquivos);
+				verificacao.verificar();
+			});
+		</script>
+	<body>
+		<div class="verificaJs"></div>
+	</body>
+</html>
