@@ -28,7 +28,7 @@
 
 	Cortex.criarModulo("requisitor", {
 		iniciar: function (microMundo) {
-			microMundo.obterRecursoJson("../../recursos/json/cortex.json", {
+			microMundo.obterRecursoJson("../recursos/json/cortex.json", {
 				sucesso: this.sucesso,
 				escopo: this
 			});

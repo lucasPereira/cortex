@@ -79,6 +79,7 @@ compilar() {
 	# cp -rf $testesCss/* $binariosCss
 	cp -rf $testesHtml/* $binariosHtml
 	# cp -rf $testesJs/* $binariosJs
+	cp -rf $recursos $binarios
 }
 
 construir() {

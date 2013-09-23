@@ -56,18 +56,30 @@
 			var usuario = autenticacao.usuario;
 			var senha = autenticacao.senha;
 			var requisicaoJson = Cortex.http.criarJson(uri, usuario, senha);
-			if (Cortex.util.existe(sucesso)) {
-				Cortex.http.adicionarTratadorDeSucesso(requisicaoJson, sucesso, escopo);
-			}
-			if (Cortex.util.existe(erro)) {
-				Cortex.http.adicionarTratadorDeErroDoCliente(requisicaoJson, erro, escopo);
-			}
-			Cortex.http.adicionarTratadorDeInformacao(requisicaoJson, this.tratarInformacaoHttp, this);
-			Cortex.http.adicionarTratadorDeSucesso(requisicaoJson, this.tratarSucessoHttp, this);
-			Cortex.http.adicionarTratadorDeRedirecionamento(requisicaoJson, this.tratarRedirecionamentoHttp, this);
-			Cortex.http.adicionarTratadorDeErroDoCliente(requisicaoJson, this.tratarErroDoClienteHttp, this);
-			Cortex.http.adicionarTratadorDeErroDoServidor(requisicaoJson, this.tratarErroDoServidorHttp, this);
+			this.adicionarTratadorHttpDeSucesso(requisicaoJson, sucesso, escopo);
+			this.adicionarTratadorHttpDeErroDoCliente(requisicaoJson, erro, escopo);
+			this.adicionarTratadoresHttpInternos(requisicaoJson);
 			return requisicaoJson;
+		},
+
+		adicionarTratadorHttpDeSucesso: function (requisicao, sucesso, escopo) {
+			if (Cortex.util.existe(sucesso)) {
+				Cortex.http.adicionarTratadorDeSucesso(requisicao, sucesso, escopo);
+			}
+		},
+
+		adicionarTratadorHttpDeErroDoCliente: function (requisicao, erroDoCliente, escopo) {
+			if (Cortex.util.existe(erroDoCliente)) {
+				Cortex.http.adicionarTratadorDeErroDoCliente(requisicao, erroDoCliente, escopo);
+			}
+		},
+
+		adicionarTratadoresHttpInternos: function (requisicao) {
+			Cortex.http.adicionarTratadorDeInformacao(requisicao, this.tratarInformacaoHttp, this);
+			Cortex.http.adicionarTratadorDeSucesso(requisicao, this.tratarSucessoHttp, this);
+			Cortex.http.adicionarTratadorDeRedirecionamento(requisicao, this.tratarRedirecionamentoHttp, this);
+			Cortex.http.adicionarTratadorDeErroDoCliente(requisicao, this.tratarErroDoClienteHttp, this);
+			Cortex.http.adicionarTratadorDeErroDoServidor(requisicao, this.tratarErroDoServidorHttp, this);
 		},
 
 		tratarHttp: function (tipo, resposta, codigoDeEstado, uri, metodo) {
