@@ -76,10 +76,6 @@
 		obterArquivo: function (nome) {
 			var requisicao = new RequisicaoTexto(nome, false);
 			return requisicao.get();
-			// var requisicao = new XMLHttpRequest();
-			// requisicao.open("GET", nome, false);
-			// requisicao.send();
-			// return requisicao.responseText;
 		},
 
 		criarListaSecaoDeErros: function () {

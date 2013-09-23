@@ -23,65 +23,21 @@
 			Cortex.comunicacao.publicar(tipo, this.nomeDoModulo, dados);
 		},
 
-		/*
-			requisicao: {
-				sucesso,
-				erro,
-				escopo,
-				autenticacao: {
-					usuario,
-					senha
-				}
-			}
-		*/
 		obterRecursoJson: function (uri, requisicao) {
 			var requisicaoJson = this.criarRequisicaoJsonHttp(uri, requisicao);
 			Cortex.http.obter(requisicaoJson, requisicao.dados);
 		},
 
-		/*
-			requisicao: {
-				sucesso,
-				erro,
-				escopo,
-				autenticacao: {
-					usuario,
-					senha
-				}
-			}
-		*/
 		postarRecursoJson: function (uri, requisicao) {
 			var requisicaoJson = this.criarRequisicaoJsonHttp(uri, requisicao);
 			Cortex.http.postar(requisicaoJson, requisicao.dados);
 		},
 
-		/*
-			requisicao: {
-				sucesso,
-				erro,
-				escopo,
-				autenticacao: {
-					usuario,
-					senha
-				}
-			}
-		*/
 		colocarRecursoJson: function (uri, requisicao) {
 			var requisicaoJson = this.criarRequisicaoJsonHttp(uri, requisicao);
 			Cortex.http.colocar(requisicaoJson, requisicao.dados);
 		},
 
-		/*
-			requisicao: {
-				sucesso,
-				erro,
-				escopo,
-				autenticacao: {
-					usuario,
-					senha
-				}
-			}
-		*/
 		removerRecursoJson: function (uri, requisicao) {
 			var requisicaoJson = this.criarRequisicaoJsonHttp(uri, requisicao);
 			Cortex.http.remover(requisicaoJson, requisicao.dados);

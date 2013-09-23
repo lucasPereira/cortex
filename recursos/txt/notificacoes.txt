@@ -1,0 +1,59 @@
+MicroMundo.tratarInformacaoHttp
+"http.informacao", {
+	resposta,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+MicroMundo.tratarSucessoHttp
+"http.sucesso", {
+	resposta,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+MicroMundo.tratarRedirecionamentoHttp
+"http.redirecionamento", {
+	resposta,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+MicroMundo.tratarErroDoClienteHttp
+"http.erroDoCliente", {
+	resposta,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+MicroMundo.tratarErroDoServidorHttp
+"http.erroDoServidor", {
+	resposta,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}

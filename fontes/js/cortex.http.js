@@ -41,7 +41,7 @@
 		},
 
 		remover: function (requisicao, dados) {
-			requisicaoJson.delete(dados);
+			requisicao.delete(dados);
 		},
 
 		adicionarTratadorDeInformacao: function (requisicao, tratador, escopo) {

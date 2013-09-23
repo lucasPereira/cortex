@@ -10,6 +10,8 @@
 			this.microMundo = null;
 		},
 
+		//publico
+
 		criarMicroMundo: function (microMundo) {
 			microMundo.SuperClasse = MicroMundo;
 			var MicroMundoCortex = Classe.criar(microMundo);

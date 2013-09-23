@@ -15,22 +15,18 @@ integracao=/var/www/$pacoteDoProjeto
 bibliotecasCss=$bibliotecas/css
 bibliotecasHtml=$bibliotecas/html
 bibliotecasJs=$bibliotecas/js
-bibliotecasJson=$bibliotecas/json
 
 binariosCss=$binarios/css
 binariosHtml=$binarios/html
 binariosJs=$binarios/js
-binariosJson=$binarios/json
 
 fontesCss=$fontes/css
 fontesHtml=$fontes/html
 fontesJs=$fontes/js
-fontesJson=$fontes/json
 
 testesCss=$testes/css
 testesHtml=$testes/html
 testesJs=$testes/js
-testesJson=$testes/json
 
 limpar() {
 	echo ":limpar"
@@ -50,19 +46,15 @@ criarEstrutura() {
 	mkdir -p $bibliotecasCss
 	mkdir -p $bibliotecasHtml
 	mkdir -p $bibliotecasJs
-	mkdir -p $bibliotecasJson
 	mkdir -p $binariosCss
 	mkdir -p $binariosHtml
 	mkdir -p $binariosJs
-	mkdir -p $binariosJson
 	mkdir -p $fontesCss
 	mkdir -p $fontesHtml
 	mkdir -p $fontesJs
-	mkdir -p $fontesJson
 	mkdir -p $testesCss
 	mkdir -p $testesHtml
 	mkdir -p $testesJs
-	mkdir -p $testesJson
 }
 
 adicionarBibliotecas() {
@@ -81,15 +73,12 @@ compilar() {
 	cp -rf $bibliotecasCss/* $binariosCss
 	# cp -rf $bibliotecasHtml/* $binariosHtml
 	cp -rf $bibliotecasJs/* $binariosJs
-	# cp -rf $bibliotecasJson/* $binariosJson
 	# cp -rf $fontesCss/* $binariosCss
 	cp -rf $fontesHtml/* $binariosHtml
 	cp -rf $fontesJs/* $binariosJs
-	cp -rf $fontesJson/* $binariosJson
 	# cp -rf $testesCss/* $binariosCss
 	cp -rf $testesHtml/* $binariosHtml
 	# cp -rf $testesJs/* $binariosJs
-	# cp -rf $testesJson/* $binariosJson
 }
 
 construir() {
