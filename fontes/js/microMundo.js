@@ -1,7 +1,7 @@
-/*global Cortex*/
-
-(function () {
+(function (contexto) {
 	"use strict";
+
+	var Cortex = contexto.Cortex;
 
 	Cortex.criarMicroMundo({
 		iniciar: function (modulo, nomeDoModulo) {
@@ -43,6 +43,11 @@
 			Cortex.http.remover(requisicaoJson, requisicao.dados);
 		},
 
+		solicitarAcre: function () {
+			this.raizDom = Cortex.dom.selecionar(this.nomeDoModulo);
+			return this.raizDom;
+		},
+
 		//privado
 
 		criarRequisicaoJsonHttp: function (uri, requisicao) {
@@ -55,7 +60,7 @@
 			}
 			var usuario = autenticacao.usuario;
 			var senha = autenticacao.senha;
-			var requisicaoJson = Cortex.http.criarJson(uri, usuario, senha);
+			var requisicaoJson = Cortex.http.criarRequisicaoJson(uri, usuario, senha);
 			this.adicionarTratadorHttpDeSucesso(requisicaoJson, sucesso, escopo);
 			this.adicionarTratadorHttpDeErroDoCliente(requisicaoJson, erro, escopo);
 			this.adicionarTratadoresHttpInternos(requisicaoJson);
@@ -111,4 +116,4 @@
 			this.tratarHttp("http.erroDoServidor", resposta, codigoDeEstado, uri, metodo);
 		}
 	});
-}());
+}(this));

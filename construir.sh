@@ -6,27 +6,19 @@ pacoteDoProjeto=cortex
 bibliotecas=bibliotecas
 binarios=binarios
 construcao=construcao
-documentacao=documentacao
 fontes=fontes
 recursos=recursos
 testes=testes
-integracao=/var/www/$pacoteDoProjeto
+integracao=$binarios/js/nodoWeb.js
 
 bibliotecasCss=$bibliotecas/css
-bibliotecasHtml=$bibliotecas/html
 bibliotecasJs=$bibliotecas/js
-
 binariosCss=$binarios/css
 binariosHtml=$binarios/html
 binariosJs=$binarios/js
-
-fontesCss=$fontes/css
 fontesHtml=$fontes/html
 fontesJs=$fontes/js
-
-testesCss=$testes/css
 testesHtml=$testes/html
-testesJs=$testes/js
 
 limpar() {
 	echo ":limpar"
@@ -44,17 +36,13 @@ criarEstrutura() {
 	mkdir -p $recursos
 	mkdir -p $testes
 	mkdir -p $bibliotecasCss
-	mkdir -p $bibliotecasHtml
 	mkdir -p $bibliotecasJs
 	mkdir -p $binariosCss
 	mkdir -p $binariosHtml
 	mkdir -p $binariosJs
-	mkdir -p $fontesCss
 	mkdir -p $fontesHtml
 	mkdir -p $fontesJs
-	mkdir -p $testesCss
 	mkdir -p $testesHtml
-	mkdir -p $testesJs
 }
 
 adicionarBibliotecas() {
@@ -63,6 +51,7 @@ adicionarBibliotecas() {
 	cp -rf ../verificaJs/construcao/verifica.css $bibliotecasCss
 	cp -rf ../verificaJs/construcao/verifica.js $bibliotecasJs
 	cp -rf ../verificaJs/construcao/jsHint.js $bibliotecasJs
+	cp -rf ../nodoWeb/construcao/nodoWeb.js $bibliotecasJs
 }
 
 compilar() {
@@ -71,14 +60,10 @@ compilar() {
 	adicionarBibliotecas
 	echo ":compilar"
 	cp -rf $bibliotecasCss/* $binariosCss
-	# cp -rf $bibliotecasHtml/* $binariosHtml
 	cp -rf $bibliotecasJs/* $binariosJs
-	# cp -rf $fontesCss/* $binariosCss
 	cp -rf $fontesHtml/* $binariosHtml
 	cp -rf $fontesJs/* $binariosJs
-	# cp -rf $testesCss/* $binariosCss
 	cp -rf $testesHtml/* $binariosHtml
-	# cp -rf $testesJs/* $binariosJs
 	cp -rf $recursos $binarios
 }
 
@@ -98,22 +83,18 @@ testar() {
 depurar() {
 	construir
 	echo ":depurar"
-	chromium-browser $binariosHtml/testeDeCodigo.html --allow-file-access-from-files
 }
 
 executar() {
 	construir
 	echo ":executar"
-	chromium-browser $binariosHtml/$pacoteDoProjeto.html
+	google-chrome $binariosHtml/$pacoteDoProjeto.html --allow-file-access-from-files
 }
 
 integrar() {
 	construir
 	echo ":integrar"
-	sudo rm -rf $integracao
-	sudo mkdir -p $integracao
-	sudo cp -r $binarios/* $integracao
-	sudo cp -r $construcao/* $integracao
+	node $integracao
 }
 
 echo :$pacoteDoProjeto

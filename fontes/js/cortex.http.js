@@ -1,11 +1,12 @@
-/*global Classe*/
-/*global MetodoHttp*/
-/*global RequisicaoJson*/
-
-(function (global) {
+(function (contexto) {
 	"use strict";
 
-	global.Cortex.http = Classe.criarSingleton({
+	var Cortex = contexto.Cortex;
+	var Classe = contexto.Classe;
+	var RequisicaoJson = contexto.RequisicaoJson;
+	var MetodoHttp = contexto.MetodoHttp;
+
+	Cortex.http = Classe.criarSingleton({
 		inicializar: function () {
 			this.recursos = {};
 			this.cache = true;
@@ -21,7 +22,7 @@
 			this.cache = false;
 		},
 
-		criarJson: function (uri, usuario, senha) {
+		criarRequisicaoJson: function (uri, usuario, senha) {
 			var requisicaoJson = new RequisicaoJson(uri);
 			requisicaoJson.fixarAutenticacao(usuario, senha);
 			requisicaoJson.tratarResposta(this.receberResposta, this);

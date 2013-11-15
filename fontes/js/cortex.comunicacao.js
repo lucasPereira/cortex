@@ -1,10 +1,11 @@
-/*global Classe*/
-/*global Linda*/
-
-(function (global) {
+(function (contexto) {
 	"use strict";
 
-	global.Cortex.comunicacao = Classe.criarSingleton({
+	var Cortex = contexto.Cortex;
+	var Linda = contexto.Linda;
+	var Classe = contexto.Classe;
+
+	Cortex.comunicacao = Classe.criarSingleton({
 		inicializar: function () {
 			this.topicos = {};
 		},

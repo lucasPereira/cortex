@@ -1,7 +1,8 @@
-/*global Cortex*/
-
-(function () {
+(function (contexto) {
 	"use strict";
+
+	var Cortex = contexto.Cortex;
+	var console = contexto.console;
 
 	Cortex.criarModulo("mensagensDoSistema", {
 		iniciar: function (microMundo) {
@@ -38,4 +39,4 @@
 			console.log("OK");
 		}
 	});
-}());
+}(this));

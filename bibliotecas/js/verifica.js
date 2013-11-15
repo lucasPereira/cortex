@@ -1,10 +1,12 @@
-/*global Dom*/
-/*global Classe*/
-/*global JSHINT*/
-/*global Linda*/
-
-(function (global) {
+(function (contexto) {
 	"use strict";
+
+	var Dom = contexto.Dom;
+	var Linda = contexto.Linda;
+	var Classe = contexto.Classe;
+	var RequisicaoTexto = contexto.RequisicaoTexto;
+	var documento = contexto.documento;
+	var jsHint = contexto.JSHINT;
 
 	var Verifica = Classe.criar({
 		inicializar: function (arquivos) {
@@ -61,8 +63,8 @@
 		verificar: function () {
 			var listaSecaoDeErros = this.criarListaSecaoDeErros();
 			this.arquivos.paraCada(function (arquivo) {
-				JSHINT(this.obterArquivo(arquivo), this.opcoes);
-				var erros = JSHINT.errors;
+				jsHint(this.obterArquivo(arquivo), this.opcoes);
+				var erros = jsHint.errors;
 				var listaErros = this.criarListaErros(arquivo, listaSecaoDeErros);
 				erros.paraCada(function (erro) {
 					if (!Linda.nulo(erro)) {
@@ -112,5 +114,5 @@
 		}
 	});
 
-	global.Verifica = Verifica;
+	contexto.Verifica = Verifica;
 }(this));

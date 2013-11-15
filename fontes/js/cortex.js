@@ -1,10 +1,10 @@
-/*global Classe*/
-/*global Linda*/
-
-(function (global) {
+(function (contexto) {
 	"use strict";
 
-	global.Cortex = Classe.criarSingleton({
+	var Linda = contexto.Linda;
+	var Classe = contexto.Classe;
+
+	contexto.Cortex = Classe.criarSingleton({
 		inicializar: function () {
 			this.modulos = {};
 			this.microMundo = null;
