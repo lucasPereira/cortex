@@ -26,7 +26,7 @@
 			}
 		},
 
-		publicar: function (topico, publicador, dados) {
+		publicarComEco: function (topico, dados) {
 			var inscritos = this.topicos[topico];
 			if (Linda.existe(inscritos)) {
 				inscritos.paraCada(function (tratador) {
@@ -35,7 +35,7 @@
 			}
 		},
 
-		publicarSemEco: function (topico, publicador, dados) {
+		publicar: function (topico, publicador, dados) {
 			var inscritos = this.topicos[topico];
 			if (Linda.existe(inscritos)) {
 				inscritos.paraCada(function (tratador, inscrito) {

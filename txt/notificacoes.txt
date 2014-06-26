@@ -1,0 +1,101 @@
+Cortex.http.tratarInformacaoDaRequisicao
+"http.informacao", {
+	conteudo,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+Cortex.http.tratarSucessoDaRequisicao
+"http.sucesso", {
+	conteudo,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+Cortex.http.tratarRedirecionamentoDaRequisicao
+"http.redirecionamento", {
+	conteudo,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+Cortex.http.tratarErroDoClienteDaRequisicao
+"http.erroDoCliente", {
+	conteudo,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+Cortex.http.tratarErroDoServidorDaRequisicao
+"http.erroDoServidor", {
+	conteudo,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+Cortex.http.fixarTratadorDeInicioDaRequisicao
+"http.inicio", {
+	uri,
+	metodo
+}
+
+Cortex.http.fixarTratadorDeProgressoDaRequisicao
+"http.progresso", {
+	uri,
+	metodo
+}
+
+Cortex.http.fixarTratadorDeTerminoDaRequisicao
+"http.termino", {
+	uri,
+	metodo
+}
+
+Cortex.http.fixarTratadorDeAbortoDaRequisicao
+"http.aborto", {
+	uri,
+	metodo
+}
+
+Cortex.http.fixarTratadorDeEstouroDeTempoDaRequisicao
+"http.estouroDeTempo", {
+	uri,
+	metodo
+}
+
+Cortex.http.fixarTratadorDeErroDaRequisicao
+"http.erro", {
+	uri,
+	metodo
+}
+
+Cortex.http.tratarUriNaoRotDaRequisicao
+"roteamento.semRota", {
+	uri,
+	estado
+}

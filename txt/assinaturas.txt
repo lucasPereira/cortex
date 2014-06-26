@@ -1,0 +1,56 @@
+MicroMundo.obterRecursoJson.requisicao
+MicroMundo.postarRecursoJson.requisicao
+MicroMundo.colocarRecursoJson.requisicao
+MicroMundo.removerRecursoJson.requisicao
+{
+	sucesso,
+	erro,
+	escopo,
+	autenticacao: {
+		usuario,
+		senha
+	}
+}
+
+Cortex.http.requisicao
+{
+	uri?,
+	metodo?,
+	aceita?,
+	tipoDeConteudo?,
+	usarUriBase?,
+	assincrono?,
+	sucesso?,
+	erro?,
+	escopo?,
+	conteudo?,
+	cabecalhos?,
+	autenticacao? {
+		usuario,
+		senha
+	}
+}
+
+Cortex.http.requisicao[sucesso]
+{
+	conteudo,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}
+
+Cortex.http.requisicao[erro]
+{
+	conteudo,
+	codigoDeEstado: {
+		codigo,
+		texto,
+		descricao
+	},
+	uri,
+	metodo
+}

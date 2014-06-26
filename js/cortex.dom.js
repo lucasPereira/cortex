@@ -9,7 +9,7 @@
 		//publico
 
 		selecionar: function (identificador) {
-			return Dom.$(Cortex.util.formatar("#%@", identificador);
+			return Dom.$(String.formatar("#%@", identificador));
 		}
 	}).instancia();
 }(this));

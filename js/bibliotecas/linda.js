@@ -515,6 +515,14 @@
 			return (this.indexOf(valor) >= 0);
 		},
 
+		juntarEmTexto: function (separador) {
+			return this.join(separador);
+		},
+
+		ordenar: function (comparador) {
+			return this.sort(comparador);
+		},
+
 		embaralhar: function () {
 			for (var indice = 0; indice < this.length; indice++) {
 				var novoIndice = Number.sortearInteiro(0, this.length - 1);
@@ -620,6 +628,12 @@
 			}
 		},
 
+		quantidade: {
+			fornecer: function () {
+				return this.length;
+			}
+		},
+
 		ultimo: {
 			fornecer: function () {
 				return this[this.length - 1];
@@ -637,6 +651,10 @@
 	"use strict";
 
 	String.implementar({
+		combinar: function (padrao) {
+			return this.match(padrao);
+		},
+
 		emBranco: function () {
 			var padraoSemEspaco = /^\s*$/;
 			return padraoSemEspaco.test(this);
@@ -658,12 +676,33 @@
 			return formatado;
 		},
 
+		paraCaixaAlta: function () {
+			return this.toUpperCase();
+		},
+
+		paraCaixaBaixa: function () {
+			return this.toLowerCase();
+		},
+
 		paraInteiro: function () {
 			return parseInt(this, 10);
 		},
 
 		paraFlutuante: function () {
 			return parseFloat(this, 10);
+		},
+
+		separar: function (padrao) {
+			return this.split(padrao);
+		},
+
+		substituir: function (padrao, novoTexto) {
+			return this.replace(padrao, novoTexto);
+		},
+
+		substituirTodos: function (padrao, novoTexto) {
+			padrao = new RegExp(padrao, "g");
+			return this.replace(padrao, novoTexto);
 		}
 	});
 
@@ -959,7 +998,8 @@
 		TEXTO: "text",
 		DOCUMENTO: "document",
 		BLOB: "blob",
-		ARRAY_BUFFER: "arraybuffer"
+		ARRAY_BUFFER: "arraybuffer",
+		QUALQUER: "",
 	});
 
 	var TipoDeObservacao = Classe.criarEnumeracaoDeConstantes({
@@ -977,7 +1017,8 @@
 		MODELO: ["model"],
 		MULTIPARTE: ["multipart"],
 		TEXTO: ["text"],
-		VIDEO: ["video"]
+		VIDEO: ["video"],
+		QUALQUER: ["*"]
 	}, {
 		inicializar: function (chave) {
 			this.chave = chave;
@@ -1007,12 +1048,13 @@
 		CSS: [TipoGenericoDeMidia.TEXTO, "css"],
 		CSV: [TipoGenericoDeMidia.TEXTO, "csv"],
 		HTML: [TipoGenericoDeMidia.TEXTO, "html"],
-		TEXTO: [TipoGenericoDeMidia.TEXTO, "plain"],
+		TXT: [TipoGenericoDeMidia.TEXTO, "plain"],
 		MP4: [TipoGenericoDeMidia.VIDEO, "mp4"],
 		MPEG: [TipoGenericoDeMidia.VIDEO, "mpeg"],
 		OGG: [TipoGenericoDeMidia.VIDEO, "ogg"],
 		VORBIS: [TipoGenericoDeMidia.VIDEO, "vorbis"],
-		WEBM: [TipoGenericoDeMidia.VIDEO, "webm"]
+		WEBM: [TipoGenericoDeMidia.VIDEO, "webm"],
+		QUALQUER: [TipoGenericoDeMidia.QUALQUER, "*"]
 	}, {
 		inicializar: function (tipoGenerico, tipo) {
 			this.tipoGenerico = tipoGenerico;
@@ -1128,7 +1170,9 @@
 }(this));
 /*global Document*/
 /*global Element*/
+/*global History*/
 /*global HTMLCollection*/
+/*global Location*/
 /*global Node*/
 /*global NodeList*/
 /*global Window*/
@@ -1143,8 +1187,8 @@
 		inicializar: function () {
 			this.janela = window;
 			this.documento = this.janela.document;
-			this.historico = this.janela.history;
 			this.localizacao = this.janela.location;
+			this.historico = this.janela.history;
 		},
 
 		carregarComponentes: function () {
@@ -1153,11 +1197,14 @@
 		},
 
 		encapsular: function (elementoDom) {
+			var Notificavel = contexto.Notificavel;
+			if (Linda.instanciaDe(elementoDom, Notificavel)) {
+				return elementoDom;
+			}
 			var Documento = contexto.Documento;
 			var Elemento = contexto.Elemento;
 			var Janela = contexto.Janela;
 			var Nodo = contexto.Nodo;
-			var Notificavel = contexto.Notificavel;
 			if (Linda.instanciaDe(elementoDom, NodeList)) {
 				return new ListaDom(elementoDom);
 			} else if (Linda.instanciaDe(elementoDom, HTMLCollection)) {
@@ -1170,6 +1217,10 @@
 				return new Nodo(elementoDom);
 			} else if (Linda.instanciaDe(elementoDom, Window)) {
 				return new Janela(elementoDom);
+			} else if (Linda.instanciaDe(elementoDom, Location)) {
+				return new Localizacao(elementoDom);
+			} else if (Linda.instanciaDe(elementoDom, History)) {
+				return new Historico(elementoDom);
 			} else {
 				return new Notificavel(elementoDom);
 			}
@@ -1196,13 +1247,108 @@
 
 	var ListaDom = Classe.criar({
 		inicializar: function (elementosDom) {
-			this.elementosDom = elementosDom;
 			this.elementoDom = elementosDom;
 		},
 
 		paraCada: function (tratador, escopo) {
-			for (var indice = 0; indice < this.elementosDom.length; indice++) {
-				tratador.chamarComEscopo(escopo, Dom.encapsular(this.elementosDom.item(indice), indice));
+			var tamanho = Dom.extrair(this).length;
+			for (var indice = 0; indice < tamanho; indice++) {
+				tratador.chamarComEscopo(escopo, Dom.encapsular(Dom.extrair(this).item(indice)), indice);
+			}
+		}
+	});
+
+	var Localizacao = Classe.criar({
+		inicializar: function (elementoDom) {
+			var Notificavel = contexto.Notificavel;
+			Notificavel.prototipo.inicializar.chamarComEscopo(this, elementoDom);
+		},
+
+		fornecerUri: function () {
+			return String.concatenar(this.protocolo, "://", this.endereco, this.caminho, this.ancora, this.busca);
+		},
+
+		fornecerUriComPorta: function () {
+			return String.concatenar(this.protocolo, "://", this.endereco, ":", this.porta, this.caminho, this.ancora, this.busca);
+		}
+	});
+
+	Localizacao.prototipo.definirPropriedades({
+		ancora: {
+			fornecer: function () {
+				return Dom.extrair(this).hash;
+			}
+		},
+
+		busca: {
+			fornecer: function () {
+				return Dom.extrair(this).search;
+			}
+		},
+
+		caminho: {
+			fornecer: function () {
+				return Dom.extrair(this).pathname;
+			}
+		},
+
+		endereco: {
+			fornecer: function () {
+				return Dom.extrair(this).hostname;
+			}
+		},
+
+		porta: {
+			fornecer: function () {
+				var elemento = Dom.extrair(this);
+				return (elemento.port === "") ? 80 : elemento.port.paraInteiro();
+			}
+		},
+
+		protocolo: {
+			fornecer: function () {
+				return Dom.extrair(this).protocol.substituir(/:$/, "");
+			}
+		}
+	});
+
+	var Historico = Classe.criar({
+		inicializar: function (elementoDom) {
+			var Notificavel = contexto.Notificavel;
+			Notificavel.prototipo.inicializar.chamarComEscopo(this, elementoDom);
+		},
+
+		adicionarEstado: function (uri, estado, titulo) {
+			if (!Linda.existe(titulo)) {
+				titulo = Dom.documentoDom.titulo;
+			}
+			Dom.extrair(this).pushState(estado, titulo, uri);
+		},
+
+		avancar: function () {
+			Dom.extrair(this).forward();
+		},
+
+		ir: function (distancia) {
+			Dom.extrair(this).go(distancia);
+		},
+
+		substituirEstado: function (uri, estado, titulo) {
+			if (!Linda.existe(titulo)) {
+				titulo = Dom.documentoDom.titulo;
+			}
+			Dom.extrair(this).replaceState(estado, titulo, uri);
+		},
+
+		voltar: function () {
+			Dom.extrair(this).back();
+		}
+	});
+
+	Historico.prototipo.definirPropriedades({
+		estado: {
+			fornecer: function () {
+				return Dom.extrair(this).state;
 			}
 		}
 	});
@@ -1213,7 +1359,11 @@
 
 	contexto.Dom = Dom;
 	contexto.ListaDom = ListaDom;
+	contexto.Localizacao = Localizacao;
+	contexto.Localizacao = Historico;
 	contexto.documento = Dom.documento;
+	contexto.localizacao = Dom.localizacao;
+	contexto.historico = Dom.historico;
 	contexto.janela = Dom.janela;
 }(this));
 (function (contexto) {
@@ -1222,6 +1372,7 @@
 	var Dom = contexto.Dom;
 	var Classe = contexto.Classe;
 	var Tecla = contexto.Tecla;
+	var Linda = contexto.Linda;
 
 	var Notificavel = Classe.criar({
 		inicializar: function (elementoDom) {
@@ -1342,9 +1493,19 @@
 			this.deixarDeTratar("dbclick", funcao);
 		},
 
+		tratarTecla: function (tecla, tratador, escopo) {
+			var tratadorPersonalizado = function (evento) {
+				if (!Linda.existe(tecla) || tecla === evento.keyCode) {
+					tratador.chamarComEscopo(escopo);
+				}
+			};
+			Dom.extrair(this).addEventListener("keypress", tratadorPersonalizado);
+			return tratadorPersonalizado;
+		},
+
 		tratarTeclaPressionada: function (tecla, tratador, escopo) {
 			var tratadorPersonalizado = function (evento) {
-				if (tecla === evento.keyCode) {
+				if (!Linda.existe(tecla) || tecla === evento.keyCode) {
 					tratador.chamarComEscopo(escopo);
 				}
 			};
@@ -1358,7 +1519,7 @@
 
 		tratarTeclaSolta: function (tecla, tratador, escopo) {
 			var tratadorPersonalizado = function (evento) {
-				if (tecla === evento.keyCode) {
+				if (!Linda.existe(tecla) || tecla === evento.keyCode) {
 					tratador.chamarComEscopo(escopo);
 				}
 			};
@@ -1579,6 +1740,14 @@
 		}
 	});
 
+	Documento.prototipo.definirPropriedades({
+		titulo: {
+			fornecer: function () {
+				return Dom.extrair(this).title;
+			}
+		}
+	});
+
 	contexto.Documento = Documento;
 }(this));
 (function (contexto) {
@@ -1717,6 +1886,16 @@
 			fixar: function (html) {
 				Dom.extrair(this).outerHTML = html;
 			}
+		},
+
+		valor: {
+			fornecer: function () {
+				return Dom.extrair(this).value;
+			},
+
+			fixar: function (valor) {
+				Dom.extrair(this).value = valor;
+			}
 		}
 	});
 
@@ -1735,18 +1914,102 @@
 	var TipoDeResposta = contexto.TipoDeResposta;
 
 	var RequisicaoHttp = Classe.criar({
-		inicializar: function (uri, assincrono, tipoDeResposta) {
+		inicializar: function (uri, assincrono) {
 			this.requisicaoXml = new XMLHttpRequest();
 			this.uri = uri;
 			this.usuario = null;
 			this.senha = null;
 			this.codigoDeEstado = null;
 			this.metodo = null;
+			this.respostaDecodificada = null;
 			this.assincrono = Linda.indefinido(assincrono) ? true : !!assincrono;
 			this.cabecalho = [];
+		},
+
+		aceita: function (tipoDeResposta, tipoDeMidia, decodificadorDeReposta) {
 			if (this.assincrono) {
 				this.requisicaoXml.responseType = tipoDeResposta;
 			}
+			this.fixarAtributoDeCabecalho(AtributoHttp.ACCEPT, tipoDeMidia);
+			this.decodificarResposta = decodificadorDeReposta;
+			return this;
+		},
+
+		aceitaJson: function () {
+			this.aceita(TipoDeResposta.JSON, TipoDeMidia.JSON.comoTexto(), this.decodificarRespostaJson);
+			return this;
+		},
+
+		aceitaHtml: function () {
+			this.aceita(TipoDeResposta.DOCUMENTO, TipoDeMidia.HTML.comoTexto(), this.decodificarRespostaHtml);
+			return this;
+		},
+
+		aceitaTxt: function () {
+			this.aceita(TipoDeResposta.TEXTO, TipoDeMidia.TXT.comoTexto(), this.decodificarRespostaTxt);
+			return this;
+		},
+
+		aceitaQualquer: function () {
+			this.aceita(TipoDeResposta.QUALQUER, TipoDeMidia.QUALQUER.comoTexto(), this.decodificarResposta);
+			return this;
+		},
+
+		envia: function (tipoDeMidia, codificadorDeEnvio) {
+			this.fixarAtributoDeCabecalho(AtributoHttp.CONTENT_TYPE, tipoDeMidia);
+			this.codificarEnvio = codificadorDeEnvio;
+			return this;
+		},
+
+		enviaJson: function () {
+			this.envia(TipoDeMidia.JSON.comoTexto(), this.codificarEnvioJson);
+			return this;
+		},
+
+		enviaHtml: function () {
+			this.envia(TipoDeMidia.HTML.comoTexto(), this.codificarEnvioHtml);
+			return this;
+		},
+
+		enviaTexto: function () {
+			this.envia(TipoDeMidia.TXT.comoTexto(), this.codificarEnvioTxt);
+			return this;
+		},
+
+		decodificarResposta: function (dado) {
+			return dado;
+		},
+
+		decodificarRespostaJson: function (dado) {
+			try {
+				return JSON.parse(dado);
+			} catch (excecao) {
+				return dado;
+			}
+		},
+
+		decodificarRespostaHtml: function (dado) {
+			return dado;
+		},
+
+		decodificarRespostaTxt: function (dado) {
+			return dado;
+		},
+
+		codificarEnvio: function (dado) {
+			return dado;
+		},
+
+		codificarEnvioJson: function (dado) {
+			return JSON.stringify(dado);
+		},
+
+		codificarEnvioHtm: function (dado) {
+			return dado;
+		},
+
+		codificarEnvioTxt: function (dado) {
+			return dado;
 		},
 
 		enviar: function (metodo, dados) {
@@ -1755,10 +2018,11 @@
 			this.cabecalho.paraCada(function (atributo) {
 				this.requisicaoXml.setRequestHeader(atributo.nome, atributo.valor);
 			}, this);
-			this.requisicaoXml.send(dados);
+			this.requisicaoXml.send(this.codificarEnvio(dados));
 			if (!this.assincrono) {
 				return this.fornecerResposta();
 			}
+			return this;
 		},
 
 		get: function (dados) {
@@ -1886,7 +2150,10 @@
 		},
 
 		fornecerResposta: function () {
-			return this.requisicaoXml.response;
+			if (Linda.nulo(this.respostaDecodificada)) {
+				this.respostaDecodificada = this.decodificarResposta(this.requisicaoXml.response);
+			}
+			return this.respostaDecodificada;
 		},
 
 		fornecerCodigoDeEstado: function () {
@@ -1897,52 +2164,7 @@
 		}
 	});
 
-	var RequisicaoJson = Classe.criar({
-		SuperClasse: RequisicaoHttp,
-
-		inicializar: function (uri, assincrono) {
-			this.super(uri, assincrono, TipoDeResposta.JSON);
-			this.fixarAtributoDeCabecalho(AtributoHttp.ACCEPT, TipoDeMidia.JSON.comoTexto());
-		},
-
-		enviaJson: function () {
-			this.fixarAtributoDeCabecalho(AtributoHttp.CONTENT_TYPE, TipoDeMidia.JSON.comoTexto());
-		},
-
-		fornecerResposta: function () {
-			return JSON.parse(this.requisicaoXml.response);
-		}
-	});
-
-	var RequisicaoHtml = Classe.criar({
-		SuperClasse: RequisicaoHttp,
-
-		inicializar: function (uri, assincrono) {
-			this.super(uri, assincrono, TipoDeResposta.DOCUMENTO);
-			this.fixarAtributoDeCabecalho(AtributoHttp.ACCEPT, TipoDeMidia.HTML.comoTexto());
-		},
-	});
-
-	var RequisicaoDocumento = Classe.criar({
-		SuperClasse: RequisicaoHttp,
-
-		inicializar: function (uri, assincrono) {
-			this.super(uri, assincrono, TipoDeResposta.DOCUMENTO);
-		}
-	});
-
-	var RequisicaoTexto = Classe.criar({
-		SuperClasse: RequisicaoHttp,
-
-		inicializar: function (uri, assincrono) {
-			this.super(uri, assincrono, TipoDeResposta.TEXTO);
-		}
-	});
-
-	contexto.RequisicaoJson = RequisicaoJson;
-	contexto.RequisicaoHtml = RequisicaoHtml;
-	contexto.RequisicaoDocumento = RequisicaoDocumento;
-	contexto.RequisicaoTexto = RequisicaoTexto;
+	contexto.RequisicaoHttp = RequisicaoHttp;
 }(this));
 (function (contexto) {
 	"use strict";
@@ -1985,7 +2207,7 @@
 		privadoFornecerDescritorDePropriedade: Linda.propriedadesDeAtributos,
 		definirPropriedade: Linda.propriedadesDeAtributos,
 		definirPropriedades: Linda.propriedadesDeAtributos,
-		// removerPropriedade: Linda.propriedadesDeAtributos,
+		removerPropriedade: Linda.propriedadesDeAtributosGravaveisConfiguraveis,
 		privadoDefinirPropriedade: Linda.propriedadesDeAtributos,
 		fundir: Linda.propriedadesDeAtributos,
 		observar: Linda.propriedadesDeAtributos,
@@ -2014,7 +2236,9 @@
 		embaralhar: Linda.propriedadesDeAtributos,
 		fornecerIndice: Linda.propriedadesDeAtributos,
 		fundir: Linda.propriedadesDeAtributos,
+		juntarEmTexto: Linda.propriedadesDeAtributos,
 		limpar: Linda.propriedadesDeAtributos,
+		ordenar: Linda.propriedadesDeAtributos,
 		paraCada: Linda.propriedadesDeAtributos,
 		quantidadeMenorQue: Linda.propriedadesDeAtributos,
 		quantidadeMenorIgualQue: Linda.propriedadesDeAtributos,
@@ -2032,10 +2256,16 @@
 	});
 
 	String.prototype.definirPropriedades({
+		combinar: Linda.propriedadesDeAtributos,
 		emBranco: Linda.propriedadesDeAtributos,
 		formatarNumero: Linda.propriedadesDeAtributos,
+		paraCaixaAlta: Linda.propriedadesDeAtributos,
+		paraCaixaBaixa: Linda.propriedadesDeAtributos,
+		paraFlutuante: Linda.propriedadesDeAtributos,
 		paraInteiro: Linda.propriedadesDeAtributos,
-		paraFlutuante: Linda.propriedadesDeAtributos
+		separar: Linda.propriedadesDeAtributos,
+		substituir: Linda.propriedadesDeAtributos,
+		substituirTodos: Linda.propriedadesDeAtributos
 	});
 
 	String.definirPropriedades({

@@ -4,7 +4,7 @@
 	var Dom = contexto.Dom;
 	var Linda = contexto.Linda;
 	var Classe = contexto.Classe;
-	var RequisicaoTexto = contexto.RequisicaoTexto;
+	var RequisicaoHttp = contexto.RequisicaoHttp;
 	var documento = contexto.documento;
 	var jsHint = contexto.JSHINT;
 
@@ -76,7 +76,8 @@
 		},
 
 		obterArquivo: function (nome) {
-			var requisicao = new RequisicaoTexto(nome, false);
+			var requisicao = new RequisicaoHttp(nome, false);
+			requisicao.aceitaTxt();
 			return requisicao.get();
 		},
 

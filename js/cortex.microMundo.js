@@ -2,11 +2,14 @@
 	"use strict";
 
 	var Cortex = contexto.Cortex;
+	var Linda = contexto.Linda;
+	var Classe = contexto.Classe;
 
-	Cortex.criarMicroMundo({
+	contexto.Cortex.microMundo = Classe.criarSingleton({
 		iniciar: function (modulo, nomeDoModulo) {
 			this.modulo = modulo;
 			this.nomeDoModulo = nomeDoModulo;
+			Cortex.roteamento.fixarRotaPadrao(this.tratarUriNaoRoteada, this);
 		},
 
 		//publico
@@ -24,38 +27,45 @@
 		},
 
 		obterRecursoJson: function (uri, requisicao) {
-			var requisicaoJson = this.criarRequisicaoJsonHttp(uri, requisicao);
+			var requisicaoJson = Cortex.microMundo.criarRequisicaoJsonHttp(uri, requisicao);
 			Cortex.http.obter(requisicaoJson, requisicao.dados);
 		},
 
 		postarRecursoJson: function (uri, requisicao) {
-			var requisicaoJson = this.criarRequisicaoJsonHttp(uri, requisicao);
+			var requisicaoJson = Cortex.microMundo.criarRequisicaoJsonHttp(uri, requisicao);
 			Cortex.http.postar(requisicaoJson, requisicao.dados);
 		},
 
 		colocarRecursoJson: function (uri, requisicao) {
-			var requisicaoJson = this.criarRequisicaoJsonHttp(uri, requisicao);
+			var requisicaoJson = Cortex.microMundo.criarRequisicaoJsonHttp(uri, requisicao);
 			Cortex.http.colocar(requisicaoJson, requisicao.dados);
 		},
 
 		removerRecursoJson: function (uri, requisicao) {
-			var requisicaoJson = this.criarRequisicaoJsonHttp(uri, requisicao);
+			var requisicaoJson = Cortex.microMundo.criarRequisicaoJsonHttp(uri, requisicao);
 			Cortex.http.remover(requisicaoJson, requisicao.dados);
 		},
 
-		solicitarAcre: function () {
-			this.raizDom = Cortex.dom.selecionar(this.nomeDoModulo);
-			return this.raizDom;
+		adicionarRota: function (uri, tratador) {
+			Cortex.roteamento.adicionarRota(uri, tratador, this.modulo);
 		},
 
-		//privado
+		redirecionar: function (uri) {
+			Cortex.roteamento.redirecionar(uri);
+		},
+
+		solicitarAcre: function (identificador) {
+			var acre = identificador || this.nomeDoModulo;
+			this.raizDom = Cortex.dom.selecionar(acre);
+			return this.raizDom;
+		},
 
 		criarRequisicaoJsonHttp: function (uri, requisicao) {
 			var autenticacao = requisicao.autenticacao;
 			var escopo = requisicao.escopo;
 			var sucesso = requisicao.sucesso;
 			var erro = requisicao.erro;
-			if (!Cortex.util.existe(autenticacao)) {
+			if (!Linda.existe(autenticacao)) {
 				autenticacao = {};
 			}
 			var usuario = autenticacao.usuario;
@@ -67,14 +77,20 @@
 			return requisicaoJson;
 		},
 
+		//privado
+
+		publicar: function (tipo, dados) {
+			Cortex.comunicacao.publicar(tipo, "microMundo", dados);
+		},
+
 		adicionarTratadorHttpDeSucesso: function (requisicao, sucesso, escopo) {
-			if (Cortex.util.existe(sucesso)) {
+			if (Linda.existe(sucesso)) {
 				Cortex.http.adicionarTratadorDeSucesso(requisicao, sucesso, escopo);
 			}
 		},
 
 		adicionarTratadorHttpDeErroDoCliente: function (requisicao, erroDoCliente, escopo) {
-			if (Cortex.util.existe(erroDoCliente)) {
+			if (Linda.existe(erroDoCliente)) {
 				Cortex.http.adicionarTratadorDeErroDoCliente(requisicao, erroDoCliente, escopo);
 			}
 		},
@@ -87,8 +103,8 @@
 			Cortex.http.adicionarTratadorDeErroDoServidor(requisicao, this.tratarErroDoServidorHttp, this);
 		},
 
-		tratarHttp: function (tipo, resposta, codigoDeEstado, uri, metodo) {
-			this.publicar(tipo, {
+		tratarInformacaoHttp: function (resposta, codigoDeEstado, uri, metodo) {
+			this.publicar("http.informacao", {
 				resposta: resposta,
 				codigoDeEstado: codigoDeEstado,
 				uri: uri,
@@ -96,24 +112,47 @@
 			});
 		},
 
-		tratarInformacaoHttp: function (resposta, codigoDeEstado, uri, metodo) {
-			this.tratarHttp("http.informacao", resposta, codigoDeEstado, uri, metodo);
-		},
-
 		tratarSucessoHttp: function (resposta, codigoDeEstado, uri, metodo) {
-			this.tratarHttp("http.sucesso", resposta, codigoDeEstado, uri, metodo);
+			this.publicar("http.sucesso", {
+				resposta: resposta,
+				codigoDeEstado: codigoDeEstado,
+				uri: uri,
+				metodo: metodo
+			});
 		},
 
 		tratarRedirecionamentoHttp: function (resposta, codigoDeEstado, uri, metodo) {
-			this.tratarHttp("http.redirecionamento", resposta, codigoDeEstado, uri, metodo);
+			this.publicar("http.redirecionamento", {
+				resposta: resposta,
+				codigoDeEstado: codigoDeEstado,
+				uri: uri,
+				metodo: metodo
+			});
 		},
 
 		tratarErroDoClienteHttp: function (resposta, codigoDeEstado, uri, metodo) {
-			this.tratarHttp("http.erroDoCliente", resposta, codigoDeEstado, uri, metodo);
+			this.publicar("http.erroDoCliente", {
+				resposta: resposta,
+				codigoDeEstado: codigoDeEstado,
+				uri: uri,
+				metodo: metodo
+			});
 		},
 
 		tratarErroDoServidorHttp: function (resposta, codigoDeEstado, uri, metodo) {
-			this.tratarHttp("http.erroDoServidor", resposta, codigoDeEstado, uri, metodo);
+			this.publicar("http.erroDoServidor", {
+				resposta: resposta,
+				codigoDeEstado: codigoDeEstado,
+				uri: uri,
+				metodo: metodo
+			});
+		},
+
+		tratarUriNaoRoteada: function (uri, estado) {
+			this.publicar("roteamento.semRota", {
+				uri: uri,
+				estado: estado
+			});
 		}
-	});
+	}).instancia();
 }(this));

@@ -3,98 +3,71 @@
 projeto=Cortex
 pacoteDoProjeto=cortex
 
-bibliotecas=bibliotecas
-binarios=binarios
+css=css
+html=html
+js=js
+json=json
+txt=txt
 construcao=construcao
-fontes=fontes
-recursos=recursos
-testes=testes
-integracao=$binarios/js/nodoWeb.js
-
-bibliotecasCss=$bibliotecas/css
-bibliotecasJs=$bibliotecas/js
-binariosCss=$binarios/css
-binariosHtml=$binarios/html
-binariosJs=$binarios/js
-fontesHtml=$fontes/html
-fontesJs=$fontes/js
-testesHtml=$testes/html
 
 limpar() {
 	echo ":limpar"
-	rm -rf $binarios
-	rm -rf $construcao
+	rm -rf ${construcao}
 }
 
 criarEstrutura() {
 	echo ":criarEstrutura"
-	mkdir -p $bibliotecas
-	mkdir -p $binarios
-	mkdir -p $construcao
-	mkdir -p $documentacao
-	mkdir -p $fontes
-	mkdir -p $recursos
-	mkdir -p $testes
-	mkdir -p $bibliotecasCss
-	mkdir -p $bibliotecasJs
-	mkdir -p $binariosCss
-	mkdir -p $binariosHtml
-	mkdir -p $binariosJs
-	mkdir -p $fontesHtml
-	mkdir -p $fontesJs
-	mkdir -p $testesHtml
+	mkdir -p ${css}
+	mkdir -p ${css}/bibliotecas
+	mkdir -p ${html}
+	mkdir -p ${html}/testes
+	mkdir -p ${js}
+	mkdir -p ${js}/bibliotecas
+	mkdir -p ${json}
+	mkdir -p ${txt}
+	mkdir -p ${construcao}
 }
 
 adicionarBibliotecas() {
 	echo ":adicionarBibliotecas"
-	cp -rf ../lindaJs/construcao/linda.js $bibliotecasJs
-	cp -rf ../verificaJs/construcao/verifica.css $bibliotecasCss
-	cp -rf ../verificaJs/construcao/verifica.js $bibliotecasJs
-	cp -rf ../verificaJs/construcao/jsHint.js $bibliotecasJs
-	cp -rf ../nodoWeb/construcao/nodoWeb.js $bibliotecasJs
-}
-
-compilar() {
-	limpar
-	criarEstrutura
-	adicionarBibliotecas
-	echo ":compilar"
-	cp -rf $bibliotecasCss/* $binariosCss
-	cp -rf $bibliotecasJs/* $binariosJs
-	cp -rf $fontesHtml/* $binariosHtml
-	cp -rf $fontesJs/* $binariosJs
-	cp -rf $testesHtml/* $binariosHtml
-	cp -rf $recursos $binarios
+	cp -rf ../lindaJs/construcao/linda.js ${js}/bibliotecas
+	cp -rf ../verificaJs/construcao/verifica.css ${css}/bibliotecas
+	cp -rf ../verificaJs/construcao/verifica.js ${js}/bibliotecas
+	cp -rf ../verificaJs/construcao/jsHint.js ${js}/bibliotecas
+	cp -rf ../nodoWeb/construcao/nodoWeb.js ${js}/bibliotecas
 }
 
 construir() {
-	compilar
+	limpar
+	criarEstrutura
+	adicionarBibliotecas
 	echo ":construir"
-	cat $binariosJs/cortex.js > $construcao/$pacoteDoProjeto.js
-	cat $binariosJs/microMundo.js >> $construcao/$pacoteDoProjeto.js
+	cat ${js}/cortex.js > ${construcao}/${pacoteDoProjeto}.js
+	cat ${js}/cortex.comunicacao.js >> ${construcao}/${pacoteDoProjeto}.js
+	cat ${js}/cortex.dom.js >> ${construcao}/${pacoteDoProjeto}.js
+	cat ${js}/cortex.http.js >> ${construcao}/${pacoteDoProjeto}.js
+	cat ${js}/cortex.roteamento.js >> ${construcao}/${pacoteDoProjeto}.js
+	cat ${js}/cortex.util.js >> ${construcao}/${pacoteDoProjeto}.js
+	cat ${js}/microMundo.js >> ${construcao}/${pacoteDoProjeto}.js
 }
 
 testar() {
-	construir
 	echo ":testar"
-	chromium-browser `find $binariosHtml -name teste*.html` --allow-file-access-from-files
-}
-
-depurar() {
-	construir
-	echo ":depurar"
+	testes=`find ${html}/testes -name teste*.html`
+	testes=`echo ${testes} | sed -e s@html/@http://localhost:7000/html/@g`
+	chromium-browser ${testes} --allow-file-access-from-files
 }
 
 executar() {
 	construir
 	echo ":executar"
-	google-chrome $binariosHtml/$pacoteDoProjeto.html --allow-file-access-from-files
+	chromium-browser ${html}/$pacoteDoProjeto.html
 }
 
 integrar() {
 	construir
 	echo ":integrar"
-	node $integracao
+	node ${js}/bibliotecas/nodoWeb.js
 }
 
 echo :$pacoteDoProjeto
